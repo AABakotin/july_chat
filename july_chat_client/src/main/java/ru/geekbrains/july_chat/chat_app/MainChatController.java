@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.july_chat.chat_app.net.ChatMessageService;
 import ru.geekbrains.july_chat.chat_app.net.MessageProcessor;
@@ -16,14 +17,19 @@ import java.util.ResourceBundle;
 
 public class MainChatController implements Initializable, MessageProcessor {
     public static final String REGEX = "%&%";
-    public VBox loginPanel;
+
     public TextField loginField;
     public PasswordField passwordField;
-    public VBox changePasswordPanel;
+    public AnchorPane changePasswordPanel;
     public PasswordField oldPassField;
     public PasswordField newPasswordField;
-    public VBox changeNickPanel;
+    public AnchorPane changeNickPanel;
     public TextField newNickField;
+    public TextField regLoginField;
+    public PasswordField regPasswordField;
+    public TextField regNickNameField;
+    public AnchorPane loginPanel;
+    public AnchorPane regPanel;
     private ChatMessageService chatMessageService;
     private String nickName;
     public VBox mainChatPanel;
@@ -38,6 +44,7 @@ public class MainChatController implements Initializable, MessageProcessor {
     }
 
     public void exit(ActionEvent actionEvent) {
+        chatMessageService.send("/exit");
         Platform.exit();
     }
 
@@ -65,9 +72,11 @@ public class MainChatController implements Initializable, MessageProcessor {
     }
 
     public void sendRegister(ActionEvent actionEvent) {
-//        if (loginField.getText().isBlank() || passwordField.getText().isBlank()) return;
-//        chatMessageService.connect();
-//        chatMessageService.send("/auth"+ REGEX + loginField.getText() + REGEX + passwordField.getText());
+        if (regLoginField.getText().isEmpty() || regPasswordField.getText().isEmpty() || regNickNameField.getText().isEmpty())
+            return;
+        chatMessageService.connect();
+        chatMessageService.send("/register" + REGEX + regLoginField.getText() + REGEX + regPasswordField.getText() + REGEX + regNickNameField.getText());
+
     }
 
     public void sendChangeNick(ActionEvent actionEvent) {
@@ -93,6 +102,11 @@ public class MainChatController implements Initializable, MessageProcessor {
                 loginPanel.setVisible(false);
                 mainChatPanel.setVisible(true);
                 break;
+            case "register_ok:":
+                regPanel.setVisible(false);
+                loginPanel.setVisible(true);
+
+
             case "ERROR:":
                 showError(parsedMessage[1]);
                 break;
@@ -102,11 +116,11 @@ public class MainChatController implements Initializable, MessageProcessor {
                 contactList.setItems(list);
                 contactList.getSelectionModel().select(0);
                 break;
-            case "/change_nick_ok" :
+            case "/change_nick_ok":
                 changeNickPanel.setVisible(false);
                 mainChatPanel.setVisible(true);
                 break;
-            case "/change_pass_ok" :
+            case "/change_pass_ok":
                 changePasswordPanel.setVisible(false);
                 mainChatPanel.setVisible(true);
                 break;
@@ -139,6 +153,11 @@ public class MainChatController implements Initializable, MessageProcessor {
         mainChatPanel.setVisible(true);
     }
 
+    public void returnToLoginPanel() {
+        regPanel.setVisible(false);
+        loginPanel.setVisible(true);
+    }
+
     public void showChangeNick(ActionEvent actionEvent) {
         mainChatPanel.setVisible(false);
         changeNickPanel.setVisible(true);
@@ -147,5 +166,11 @@ public class MainChatController implements Initializable, MessageProcessor {
     public void showChangePass(ActionEvent actionEvent) {
         mainChatPanel.setVisible(false);
         changePasswordPanel.setVisible(true);
+    }
+
+
+    public void regNow(ActionEvent actionEvent) {
+        loginPanel.setVisible(false);
+        regPanel.setVisible(true);
     }
 }

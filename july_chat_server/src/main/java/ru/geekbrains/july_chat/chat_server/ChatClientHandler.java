@@ -1,12 +1,11 @@
 package ru.geekbrains.july_chat.chat_server;
 
-import ru.geekbrains.july_chat.chat_server.error.UserNotFoundException;
-import ru.geekbrains.july_chat.chat_server.error.WrongCredentialsException;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ChatClientHandler {
     public static final String REGEX = "%&%";
@@ -31,7 +30,9 @@ public class ChatClientHandler {
 
     public void handle() {
         handlerThread = new Thread(() -> {
+
             authorize();
+
             try {
                 while (!Thread.currentThread().isInterrupted() && socket.isConnected()) {
                     String message = in.readUTF();
@@ -41,12 +42,13 @@ public class ChatClientHandler {
                 e.printStackTrace();
             } finally {
                 server.removeAuthorizedClientFromList(this);
+
+
             }
         });
         handlerThread.start();
     }
 
-    //auth: lllll ppppp
     private void authorize() {
         while (true) {
             try {
@@ -83,6 +85,9 @@ public class ChatClientHandler {
                     break;
                 case "/remove":
                     server.getAuthService().deleteUser(this.currentUser);
+                    this.socket.close();
+                    break;
+                case "/exit":
                     this.socket.close();
                     break;
                 case "/register":

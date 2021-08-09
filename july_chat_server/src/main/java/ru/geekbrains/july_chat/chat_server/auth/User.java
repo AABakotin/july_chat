@@ -18,6 +18,7 @@ public class User {
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +
                 '}';
+
     }
 
 
