@@ -12,11 +12,53 @@
             fx:controller="ru.geekbrains.july_chat.chat_app.MainChatController"
             prefHeight="400.0" prefWidth="600.0">
 
-    <VBox fx:id="mainChatPanel" >
+    <VBox visible="false" fx:id="changeNickPanel">
+
+        <HBox VBox.vgrow="ALWAYS">
+            <VBox>
+                <Label text="Please enter your new nickname:"/>
+                <TextField fx:id="newNickField" onAction="#sendChangeNick"/>
+            </VBox>
+        </HBox>
+        <Button text="SEND" onAction="#sendChangeNick"/>
+        <Button text="RETURN" onAction="#returnToChat"/>
+    </VBox>
+
+    <VBox visible="false" fx:id="changePasswordPanel">
+
+        <HBox VBox.vgrow="ALWAYS">
+            <VBox>
+                <Label text="Please enter your old password:"/>
+                <PasswordField fx:id="oldPassField" onAction="#sendChangePass"/>
+            </VBox>
+            <VBox>
+                <Label text="Please enter your new password:"/>
+                <PasswordField fx:id="newPasswordField" onAction="#sendChangePass"/>
+            </VBox>
+        </HBox>
+        <Button text="SEND" onAction="#sendChangePass"/>
+        <Button text="RETURN" onAction="#returnToChat"/>
+    </VBox>
+
+    <VBox visible="true" fx:id="loginPanel">
+
+        <HBox VBox.vgrow="ALWAYS">
+            <VBox>
+                <Label text="Please enter your login:"/>
+                <TextField fx:id="loginField" onAction="#sendAuth"/>
+            </VBox>
+            <VBox>
+                <Label text="Please enter your password:"/>
+                <PasswordField fx:id="passwordField" onAction="#sendAuth"/>
+            </VBox>
+        </HBox>
+        <Button text="SEND" onAction="#sendAuth"/>
+    </VBox>
+    <VBox fx:id="mainChatPanel" visible="false">
         <MenuBar>
             <Menu text="File">
-                <MenuItem text="Item1" onAction="#mockAction"/>
-                <MenuItem text="Item2" onAction="#mockAction"/>
+                <MenuItem text="Change nick" onAction="#showChangeNick"/>
+                <MenuItem text="Change pass" onAction="#showChangePass"/>
                 <MenuItem text="Item3" onAction="#mockAction"/>
                 <MenuItem text="Item4" onAction="#mockAction"/>
                 <MenuItem text="Item5" onAction="#mockAction"/>
@@ -41,7 +83,7 @@
                 <MenuItem text="Item2" onAction="#mockAction"/>
                 <MenuItem text="Item3" onAction="#mockAction"/>
                 <MenuItem text="Item4" onAction="#mockAction"/>
-                <MenuItem text="Item5" onAction="#mockAction"/>
+                <MenuItem text="DELETE MY ACCOUNT" onAction="#sendEternalLogout"/>
             </Menu>
         </MenuBar>
         <HBox VBox.vgrow="ALWAYS">
