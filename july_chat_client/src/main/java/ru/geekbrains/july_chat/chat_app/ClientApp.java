@@ -20,7 +20,7 @@ public class ClientApp extends Application {
 
         Scene scene = new Scene(parent);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("July chat");
+        primaryStage.setTitle("Welcome to July chat");
         primaryStage.show();
     }
 }

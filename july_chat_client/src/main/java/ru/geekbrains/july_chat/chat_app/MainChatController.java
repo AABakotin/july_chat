@@ -11,13 +11,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.july_chat.chat_app.net.ChatMessageService;
 import ru.geekbrains.july_chat.chat_app.net.MessageProcessor;
+import ru.geekbrains.july_chat.chat_app.net.NetworkService;
 
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MainChatController implements Initializable, MessageProcessor {
-    public static final String REGEX = "%&%";
 
+    public static final String REGEX = "%&%";
     public TextField loginField;
     public PasswordField passwordField;
     public AnchorPane changePasswordPanel;
@@ -105,8 +107,6 @@ public class MainChatController implements Initializable, MessageProcessor {
             case "register_ok:":
                 regPanel.setVisible(false);
                 loginPanel.setVisible(true);
-
-
             case "ERROR:":
                 showError(parsedMessage[1]);
                 break;

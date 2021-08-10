@@ -2,8 +2,10 @@ package ru.geekbrains.july_chat.chat_app.net;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class NetworkService {
     private static final String HOST = "127.0.0.1";
@@ -26,7 +28,11 @@ public class NetworkService {
                 try {
                     String message = in.readUTF();
                     chatMessageService.receive(message);
-                } catch (IOException e) {
+
+                }catch (EOFException e) {
+                    System.err.println("Disconnected form server");return;
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -38,7 +44,10 @@ public class NetworkService {
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);
-        } catch (IOException e) {
+        } catch (SocketException e){
+            System.err.println("Cant send message with out connected server");
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }

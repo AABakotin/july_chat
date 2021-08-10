@@ -6,20 +6,17 @@ import ru.geekbrains.july_chat.chat_server.auth.InMemoryAuthService;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
 
 public class JulyChatServer {
     private static final int PORT = 8089;
     private AuthService authService;
-    //    private List<ChatClientHandler> handlers;
     private Map<String, ChatClientHandler> handlers;
 
     public JulyChatServer() {
         this.authService = new InMemoryAuthService();
-//        this.handlers = new ArrayList<>();
         this.handlers = new HashMap<>();
     }
 
@@ -27,15 +24,18 @@ public class JulyChatServer {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server start!");
             while (true) {
+                authService.start();
                 System.out.println("Waiting for connection......");
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
                 new ChatClientHandler(socket, this).handle();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     public void broadcastMessage(String from, String message) {
         message = String.format("[%s]: %s", from, message);

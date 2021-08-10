@@ -1,6 +1,9 @@
 package ru.geekbrains.july_chat.chat_app.net;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketException;
+
 
 public class ChatMessageService {
     private MessageProcessor messageProcessor;
@@ -16,9 +19,13 @@ public class ChatMessageService {
         try {
             this.networkService = new NetworkService(this);
             networkService.readMessages();
+        } catch (EOFException e) {
+            System.err.println("Disconnected form server");
+            return;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public boolean isConnected() {

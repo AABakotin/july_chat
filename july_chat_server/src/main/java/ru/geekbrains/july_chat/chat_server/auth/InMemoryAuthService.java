@@ -12,9 +12,7 @@ public class InMemoryAuthService implements AuthService {
     private List<User> users;
 
     public InMemoryAuthService() {
-//        this.users = Arrays.asList();
         this.users = new ArrayList<>(
-//                List.of() java 9+
                 Arrays.asList(
                         new User("log1", "pass", "nick1"),
                         new User("log2", "pass", "nick2"),
