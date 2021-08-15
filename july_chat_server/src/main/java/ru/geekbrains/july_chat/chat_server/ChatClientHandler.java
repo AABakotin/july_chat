@@ -1,11 +1,23 @@
 package ru.geekbrains.july_chat.chat_server;
 
 
+import com.sun.corba.se.impl.orbutil.closure.Future;
+import javafx.application.Platform;
+import jdk.nashorn.internal.runtime.JSONListAdapter;
+
+import javax.management.timer.Timer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLOutput;
+import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 
 public class ChatClientHandler {
     public static final String REGEX = "%&%";
@@ -15,6 +27,9 @@ public class ChatClientHandler {
     private Thread handlerThread;
     private JulyChatServer server;
     private String currentUser;
+    private Timer timer = new Timer();
+    private static final int TIME_WAIT = 120;
+    private final ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
 
     public ChatClientHandler(Socket socket, JulyChatServer server) {
         try {
@@ -28,34 +43,57 @@ public class ChatClientHandler {
         }
     }
 
+    private void closeConnection() {
+        try {
+            this.out.close();
+            this.in.close();
+            this.socket.close();
+
+        } catch (SocketException | EOFException o) {
+            System.err.println
+                    ("Client disconnected");return;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        server.removeAuthorizedClientFromList(this);
+        return;
+    }
+
     public void handle() {
         handlerThread = new Thread(() -> {
 
             authorize();
-
             try {
                 while (!Thread.currentThread().isInterrupted() && socket.isConnected()) {
                     String message = in.readUTF();
                     handleMessage(message);
                 }
+            } catch (SocketException |EOFException e) {
+                System.err.println
+                        ("Client disconnected");return;
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                server.removeAuthorizedClientFromList(this);
-
+                closeConnection();
 
             }
         });
         handlerThread.start();
     }
 
+
     private void authorize() {
         while (true) {
             try {
                 String message = in.readUTF();
                 if (message.startsWith("/auth") || message.startsWith("/register")) {
-                    if (handleMessage(message)) break;
+                    if (handleMessage(message)) {
+                        break;
+                    }
                 }
+            } catch (SocketException |EOFException e) {
+                System.err.println
+                        ("Client disconnected");return;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -91,16 +129,21 @@ public class ChatClientHandler {
                     this.socket.close();
                     break;
                 case "/register":
+                    scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
                     server.getAuthService().createNewUser(parsed[1], parsed[2], parsed[3]);
+                    scheduledExecutor.shutdownNow();
                     sendMessage("register_ok:");
                     break;
                 case "/auth":
+                    scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
                     this.currentUser = server.getAuthService().getNicknameByLoginAndPassword(parsed[1], parsed[2]);
                     if (server.isNicknameBusy(currentUser)) {
                         sendMessage("ERROR:" + REGEX + "U're clone!");
                     } else {
                         this.server.addAuthorizedClientToList(this);
+                        scheduledExecutor.shutdownNow();
                         sendMessage("authok:" + REGEX + this.currentUser);
+                        System.out.println("Client has been Auth");
                         return true;
                     }
                     break;
@@ -111,10 +154,6 @@ public class ChatClientHandler {
             sendMessage("ERROR:" + REGEX + e.getMessage());
         }
         return false;
-    }
-
-    public Thread getHandlerThread() {
-        return handlerThread;
     }
 
     public String getCurrentUser() {
