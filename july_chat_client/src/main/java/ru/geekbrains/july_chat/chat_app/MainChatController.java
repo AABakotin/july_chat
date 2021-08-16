@@ -41,12 +41,49 @@ public class MainChatController implements Initializable, MessageProcessor {
     public Button btnSendMessage;
 
 
+
+    private void parseMessage(String message) {
+        String[] parsedMessage = message.split(REGEX);
+        switch (parsedMessage[0]) {
+            case "authok:":
+                this.nickName = parsedMessage[1];
+                loginPanel.setVisible(false);
+                mainChatPanel.setVisible(true);
+                break;
+            case "register_ok:":
+                regPanel.setVisible(false);
+                loginPanel.setVisible(true);
+                showContext();
+            case "ERROR:":
+                showError(parsedMessage[1]);
+                break;
+            case "/list:":
+                parsedMessage[0] = "ALL";
+                ObservableList<String> list = FXCollections.observableArrayList(parsedMessage);
+                contactList.setItems(list);
+                contactList.getSelectionModel().select(0);
+                break;
+            case "/change_nick_ok":
+                changeNickPanel.setVisible(false);
+                mainChatPanel.setVisible(true);
+                break;
+            case "/change_pass_ok":
+                changePasswordPanel.setVisible(false);
+                mainChatPanel.setVisible(true);
+                break;
+            default:
+                mainChatArea.appendText(parsedMessage[0] + System.lineSeparator());
+        }
+
+    }
+
     public void mockAction(ActionEvent actionEvent) {
 
     }
 
     public void exit(ActionEvent actionEvent) {
         chatMessageService.send("/exit");
+
         Platform.exit();
     }
 
@@ -96,47 +133,17 @@ public class MainChatController implements Initializable, MessageProcessor {
         chatMessageService.send("/remove");
     }
 
-    private void parseMessage(String message) {
-        String[] parsedMessage = message.split(REGEX);
-        switch (parsedMessage[0]) {
-            case "authok:":
-                this.nickName = parsedMessage[1];
-                loginPanel.setVisible(false);
-                mainChatPanel.setVisible(true);
-                break;
-            case "register_ok:":
-                regPanel.setVisible(false);
-                loginPanel.setVisible(true);
-            case "ERROR:":
-                showError(parsedMessage[1]);
-                break;
-            case "/list:":
-                parsedMessage[0] = "ALL";
-                ObservableList<String> list = FXCollections.observableArrayList(parsedMessage);
-                contactList.setItems(list);
-                contactList.getSelectionModel().select(0);
-                break;
-            case "/change_nick_ok":
-                changeNickPanel.setVisible(false);
-                mainChatPanel.setVisible(true);
-                break;
-            case "/change_pass_ok":
-                changePasswordPanel.setVisible(false);
-                mainChatPanel.setVisible(true);
-                break;
-            default:
-                mainChatArea.appendText(parsedMessage[0] + System.lineSeparator());
-        }
-
-    }
-
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("ERROR");
         alert.setHeaderText(message);
-
         alert.showAndWait();
-
+    }
+    private void showContext(){
+        Alert context = new Alert (Alert.AlertType.INFORMATION);
+        context.setTitle("Login and Password has been created!");
+        context.setHeaderText("Please, enter your login and password.");
+        context.showAndWait();
     }
 
     @Override
