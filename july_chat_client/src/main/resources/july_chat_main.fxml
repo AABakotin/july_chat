@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.july_chat.chat_app.MainChatController">
+<AnchorPane prefHeight="349.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.july_chat.chat_app.MainChatController">
 
     <AnchorPane fx:id="loginPanel" layoutX="-3.0" prefHeight="501.0" prefWidth="630.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="0.0">
         <Label layoutX="77.0" layoutY="29.0" text="Welcome to July Chat! Please enter your login &amp; password or register account. Have Fun." />
@@ -42,7 +42,6 @@
     </AnchorPane>
 
     <AnchorPane fx:id="changePasswordPanel" prefHeight="501.0" prefWidth="630.0" visible="false">
-
         <HBox prefHeight="52.0" prefWidth="630.0" VBox.vgrow="ALWAYS">
             <VBox />
             <VBox />
@@ -54,9 +53,6 @@
           <PasswordField fx:id="newPasswordField" layoutX="250.0" layoutY="238.0" onAction="#sendChangePass" prefHeight="25.0" prefWidth="149.0" />
           <Label layoutX="236.0" layoutY="200.0" text="Please enter your new password:" />
     </AnchorPane>
-
-
-
 
 
 

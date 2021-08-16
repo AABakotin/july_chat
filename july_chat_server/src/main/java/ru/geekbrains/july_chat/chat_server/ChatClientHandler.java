@@ -1,19 +1,12 @@
 package ru.geekbrains.july_chat.chat_server;
 
 
-import com.sun.corba.se.impl.orbutil.closure.Future;
-import javafx.application.Platform;
-import jdk.nashorn.internal.runtime.JSONListAdapter;
-
 import javax.management.timer.Timer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.SQLOutput;
-import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +21,7 @@ public class ChatClientHandler {
     private JulyChatServer server;
     private String currentUser;
     private Timer timer = new Timer();
-    private static final int TIME_WAIT = 120;
+    private static final int TIME_WAIT = 5;
     private final ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
 
     public ChatClientHandler(Socket socket, JulyChatServer server) {
@@ -38,8 +31,9 @@ public class ChatClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             System.out.println("Handler created");
             this.server = server;
+            scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Client has been disconnected");
         }
     }
 
@@ -48,15 +42,11 @@ public class ChatClientHandler {
             this.out.close();
             this.in.close();
             this.socket.close();
-
-        } catch (SocketException | EOFException o) {
-            System.err.println
-                    ("Client disconnected");return;
         } catch (IOException e) {
             e.printStackTrace();
         }
         server.removeAuthorizedClientFromList(this);
-        return;
+
     }
 
     public void handle() {
@@ -68,11 +58,8 @@ public class ChatClientHandler {
                     String message = in.readUTF();
                     handleMessage(message);
                 }
-            } catch (SocketException |EOFException e) {
-                System.err.println
-                        ("Client disconnected");return;
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Client has been disconnected");
             } finally {
                 closeConnection();
 
@@ -91,11 +78,8 @@ public class ChatClientHandler {
                         break;
                     }
                 }
-            } catch (SocketException |EOFException e) {
-                System.err.println
-                        ("Client disconnected");return;
             } catch (IOException e) {
-                e.printStackTrace();
+                return;
             }
         }
     }
@@ -129,13 +113,11 @@ public class ChatClientHandler {
                     this.socket.close();
                     break;
                 case "/register":
-                    scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
                     server.getAuthService().createNewUser(parsed[1], parsed[2], parsed[3]);
                     scheduledExecutor.shutdownNow();
                     sendMessage("register_ok:");
                     break;
                 case "/auth":
-                    scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
                     this.currentUser = server.getAuthService().getNicknameByLoginAndPassword(parsed[1], parsed[2]);
                     if (server.isNicknameBusy(currentUser)) {
                         sendMessage("ERROR:" + REGEX + "U're clone!");
@@ -143,7 +125,7 @@ public class ChatClientHandler {
                         this.server.addAuthorizedClientToList(this);
                         scheduledExecutor.shutdownNow();
                         sendMessage("authok:" + REGEX + this.currentUser);
-                        System.out.println("Client has been Auth");
+                        System.out.println("Client passed authorization");
                         return true;
                     }
                     break;
