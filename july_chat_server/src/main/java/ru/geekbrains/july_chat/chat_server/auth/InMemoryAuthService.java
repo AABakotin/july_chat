@@ -1,9 +1,7 @@
 package ru.geekbrains.july_chat.chat_server.auth;
-
 import ru.geekbrains.july_chat.chat_server.error.BadRequestException;
 import ru.geekbrains.july_chat.chat_server.error.UserNotFoundException;
 import ru.geekbrains.july_chat.chat_server.error.WrongCredentialsException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

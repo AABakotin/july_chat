@@ -1,6 +1,7 @@
 package ru.geekbrains.july_chat.chat_server;
 
 import ru.geekbrains.july_chat.chat_server.auth.AuthService;
+import ru.geekbrains.july_chat.chat_server.auth.DatabaseAuthService;
 import ru.geekbrains.july_chat.chat_server.auth.InMemoryAuthService;
 
 import java.io.IOException;
@@ -16,7 +17,8 @@ public class JulyChatServer {
     private Map<String, ChatClientHandler> handlers;
 
     public JulyChatServer() {
-        this.authService = new InMemoryAuthService();
+        // this.authService = new InMemoryAuthService();
+        this.authService = new DatabaseAuthService();
         this.handlers = new HashMap<>();
     }
 
