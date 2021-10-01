@@ -2,6 +2,7 @@ package ru.geekbrains.july_chat.chat_server.db;
 
 
 import java.sql.*;
+
 import ru.geekbrains.july_chat.chat_server.error.UserNotFoundException;
 
 public class ClientsDatabaseService {
@@ -10,6 +11,8 @@ public class ClientsDatabaseService {
     private static final String CONNECTION = "jdbc:sqlite:db/clients.db";
     private static final String GET_USERNAME = "select username from clients where login = ? and password = ?;";
     private static final String CHANGE_USERNAME = "update clients set username = ? where username = ?;";
+    private static final String ADD_NEW_USER = "insert into clients (login, password, username) " +
+            "values ('?', '?', '?');";
     private static final String CREATE_DB = "create table if not exists clients (id integer primary key autoincrement," +
             " login text unique not null, password text not null, username text unique not null);";
     private static final String INIT_DB = "insert into clients (login, password, username) " +
@@ -25,7 +28,7 @@ public class ClientsDatabaseService {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-      //  createDb();
+        //  createDb();
     }
 
     public static ClientsDatabaseService getInstance() {
@@ -41,6 +44,17 @@ public class ClientsDatabaseService {
             if (ps.executeUpdate() > 0) return newName;
         }
         return oldName;
+    }
+
+    public String createNewUser(String login, String password, String username) throws SQLException { // Пока не рабтает
+        try (PreparedStatement ps = connection.prepareStatement(ADD_NEW_USER)) {
+            ps.setString(1, login);
+            ps.setString(2, password);
+            ps.setString(3, username);
+            System.out.println(login + "\n" + password + "\n" + username);
+        }
+
+        return login;
     }
 
     public String getClientNameByLoginPass(String login, String pass) {
