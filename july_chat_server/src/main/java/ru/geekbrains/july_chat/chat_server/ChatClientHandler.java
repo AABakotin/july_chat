@@ -114,8 +114,8 @@ public class ChatClientHandler {
                     break;
                 case "/register":
                     server.getAuthService().createNewUser(parsed[1], parsed[2], parsed[3]);
-                    scheduledExecutor.shutdownNow();
                     sendMessage("register_ok:");
+                    scheduledExecutor.shutdownNow();
                     break;
                 case "/auth":
                     this.currentUser = server.getAuthService().getNicknameByLoginAndPassword(parsed[1], parsed[2]);

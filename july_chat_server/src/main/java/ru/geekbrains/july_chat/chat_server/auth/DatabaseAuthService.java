@@ -38,8 +38,12 @@ public class DatabaseAuthService implements AuthService {
     }
 
     @Override
-    public String createNewUser(String login, String password, String nickname) throws SQLException{
-            return dbService.createNewUser(login, password, nickname);
+    public void createNewUser(String login, String password, String username) {
+        try {
+            dbService.createNewUser(login, password, username);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

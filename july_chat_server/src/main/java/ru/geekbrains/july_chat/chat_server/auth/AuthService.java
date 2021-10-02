@@ -8,6 +8,6 @@ public interface AuthService {
     String getNicknameByLoginAndPassword(String login, String password);
     String changeNickname(String oldNick, String newNick);
     void changePassword(String nickname, String oldPassword, String newPassword);
-    String createNewUser(String login, String password, String nickname) throws SQLException;
+    void createNewUser(String login, String password, String nickname) throws SQLException;
     void deleteUser(String nickname);
 }
