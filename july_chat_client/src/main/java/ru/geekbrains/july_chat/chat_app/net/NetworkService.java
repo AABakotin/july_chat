@@ -30,7 +30,8 @@ public class NetworkService {
                     chatMessageService.receive(message);
 
                 }catch (EOFException e) {
-                    System.err.println("Disconnected form server");return;
+                    System.err.println("Disconnected form server");
+                    return;
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -45,7 +46,7 @@ public class NetworkService {
         try {
             out.writeUTF(message);
         } catch (SocketException e){
-            System.err.println("Cant send message with out connected server");
+            System.err.println("Can't send message with out connected server");
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -2,7 +2,7 @@ package ru.geekbrains.july_chat.chat_app.net;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.SocketException;
+
 
 
 public class ChatMessageService {

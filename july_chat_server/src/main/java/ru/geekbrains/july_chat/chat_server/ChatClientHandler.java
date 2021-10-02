@@ -4,7 +4,6 @@ package ru.geekbrains.july_chat.chat_server;
 import javax.management.timer.Timer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,8 +20,9 @@ public class ChatClientHandler {
     private JulyChatServer server;
     private String currentUser;
     private Timer timer = new Timer();
-    private static final int TIME_WAIT = 5;
+    private static final int TIME_WAIT = 120;
     private final ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
+
 
     public ChatClientHandler(Socket socket, JulyChatServer server) {
         try {
@@ -133,7 +133,7 @@ public class ChatClientHandler {
                     sendMessage("ERROR:" + REGEX + "command not found!");
             }
         } catch (Exception e) {
-            sendMessage("ERROR:" + REGEX + e.getMessage());
+            sendMessage("ERROR:" + REGEX + "Login & Password uncorrected");
         }
         return false;
     }

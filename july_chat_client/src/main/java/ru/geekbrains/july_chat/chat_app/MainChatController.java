@@ -11,9 +11,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.july_chat.chat_app.net.ChatMessageService;
 import ru.geekbrains.july_chat.chat_app.net.MessageProcessor;
-import ru.geekbrains.july_chat.chat_app.net.NetworkService;
-
-import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -55,7 +52,11 @@ public class MainChatController implements Initializable, MessageProcessor {
                 loginPanel.setVisible(true);
                 showContext();
             case "ERROR:":
-                showError(parsedMessage[1]);
+                try {
+                    showError(parsedMessage[1]);
+                }catch (ArrayIndexOutOfBoundsException e){
+                    System.out.println("Registration complete");
+                }
                 break;
             case "/list:":
                 parsedMessage[0] = "ALL";
