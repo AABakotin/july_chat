@@ -11,7 +11,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.july_chat.chat_app.net.ChatMessageService;
 import ru.geekbrains.july_chat.chat_app.net.MessageProcessor;
+
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainChatController implements Initializable, MessageProcessor {
@@ -29,23 +31,27 @@ public class MainChatController implements Initializable, MessageProcessor {
     public TextField regNickNameField;
     public AnchorPane loginPanel;
     public AnchorPane regPanel;
-    private ChatMessageService chatMessageService;
-    private String nickName;
     public VBox mainChatPanel;
     public TextArea mainChatArea;
     public ListView<String> contactList;
     public TextField inputField;
     public Button btnSendMessage;
 
-
+    private ChatMessageService chatMessageService;
+    private HistoryManager historyManager;
 
     private void parseMessage(String message) {
         String[] parsedMessage = message.split(REGEX);
         switch (parsedMessage[0]) {
             case "authok:":
-                this.nickName = parsedMessage[1];
+                String nickName = parsedMessage[1];
                 loginPanel.setVisible(false);
                 mainChatPanel.setVisible(true);
+              this.historyManager = new HistoryManager(nickName);
+                List<String> history = historyManager.readHistory();
+                for (String s : history) {
+                    mainChatArea.appendText(s + System.lineSeparator());
+                }
                 break;
             case "register_ok:":
                 regPanel.setVisible(false);
@@ -54,7 +60,7 @@ public class MainChatController implements Initializable, MessageProcessor {
             case "ERROR:":
                 try {
                     showError(parsedMessage[1]);
-                }catch (ArrayIndexOutOfBoundsException e){
+                } catch (ArrayIndexOutOfBoundsException e) {
                     System.out.println("Registration complete");
                 }
                 break;
@@ -96,6 +102,7 @@ public class MainChatController implements Initializable, MessageProcessor {
         if (recipient.equals("ALL")) message = "/" + recipient + REGEX + text;
         else message = "/w" + REGEX + recipient + REGEX + text;
         chatMessageService.send(message);
+        historyManager.writeHistory(String.format("[ME] %s\n", text));
         inputField.clear();
     }
 
@@ -140,8 +147,9 @@ public class MainChatController implements Initializable, MessageProcessor {
         alert.setHeaderText(message);
         alert.showAndWait();
     }
-    private void showContext(){
-        Alert context = new Alert (Alert.AlertType.INFORMATION);
+
+    private void showContext() {
+        Alert context = new Alert(Alert.AlertType.INFORMATION);
         context.setTitle("Login and Password has been created!");
         context.setHeaderText("Please, enter your login and password.");
         context.showAndWait();
