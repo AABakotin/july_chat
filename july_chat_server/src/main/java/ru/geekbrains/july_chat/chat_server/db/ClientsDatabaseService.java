@@ -14,7 +14,6 @@ public class ClientsDatabaseService {
     private static final String ADD_NEW_USER = "insert into clients (login, password, username) values (?, ?, ?);";
     private static ClientsDatabaseService instance;
     private Statement statement;
-    private static PreparedStatement ps;
     private Connection connection;
 
     public ClientsDatabaseService() {
