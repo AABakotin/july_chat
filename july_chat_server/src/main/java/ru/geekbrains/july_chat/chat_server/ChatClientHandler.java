@@ -6,9 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 public class ChatClientHandler {
@@ -16,7 +14,6 @@ public class ChatClientHandler {
     private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
-    private Thread handlerThread;
     private JulyChatServer server;
     private String currentUser;
     private Timer timer = new Timer();
@@ -49,9 +46,9 @@ public class ChatClientHandler {
 
     }
 
-    public void handle() {
-        handlerThread = new Thread(() -> {
 
+    public void handle() {
+        server.getExecuteService().execute(() -> {
             authorize();
             try {
                 while (!Thread.currentThread().isInterrupted() && socket.isConnected()) {
@@ -65,7 +62,6 @@ public class ChatClientHandler {
 
             }
         });
-        handlerThread.start();
     }
 
 

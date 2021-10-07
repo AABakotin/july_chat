@@ -15,8 +15,10 @@ public class HistoryManager {
     private static final int SIZE_OF_RETRIEVED_HISTORY = 100;
     private static final String HISTORY_PATH = "history/";
     private File history;
+    private String nick;
 
     public HistoryManager(String nickName) {
+        this.nick= nickName;
         this.history = new File(HISTORY_PATH + "history_" + nickName + ".txt");
         if (!history.exists()) {
             File path = new File(HISTORY_PATH);
@@ -50,7 +52,7 @@ public class HistoryManager {
             }
         }
         if (result != null) {
-            System.out.println("History for " + result.size());
+            System.out.println("History for " + this.nick);
         }
         return result;
     }

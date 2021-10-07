@@ -8,17 +8,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class JulyChatServer {
     private static final int PORT = 8089;
     private AuthService authService;
     private Map<String, ChatClientHandler> handlers;
+    private ExecutorService es;
 
     public JulyChatServer() {
-        // this.authService = new InMemoryAuthService();
         this.authService = new DatabaseAuthService();
         this.handlers = new HashMap<>();
+        this.es = Executors.newCachedThreadPool();
     }
 
     public void start() {
@@ -84,7 +87,9 @@ public class JulyChatServer {
     public boolean isNicknameBusy(String nickname) {
         return this.handlers.containsKey(nickname);
     }
-}
+
+    public ExecutorService getExecuteService() {return es;}
+    }
 
 
 
