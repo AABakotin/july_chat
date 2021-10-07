@@ -59,7 +59,7 @@ public class ChatClientHandler {
                 System.err.println("Client has been disconnected");
             } finally {
                 closeConnection();
-
+                server.getExecuteService().shutdown();
             }
         });
     }
