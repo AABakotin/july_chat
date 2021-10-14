@@ -3,6 +3,11 @@ package ru.geekbrains.july_chat.chat_server.db;
 
 import java.sql.*;
 
+import com.sun.org.apache.xalan.internal.xsltc.dom.SimpleResultTreeImpl;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.geekbrains.july_chat.chat_server.ChatClientHandler;
 import ru.geekbrains.july_chat.chat_server.error.UserNotFoundException;
 
 public class ClientsDatabaseService {
@@ -12,9 +17,12 @@ public class ClientsDatabaseService {
     private static final String GET_USERNAME = "select username from clients where login = ? and password = ?;";
     private static final String CHANGE_USERNAME = "update clients set username = ? where username = ?;";
     private static final String ADD_NEW_USER = "insert into clients (login, password, username) values (?, ?, ?);";
+    private static final String CHANGE_PASSWORD = "update clients set password = ? where username = ? and password = ?";
     private static ClientsDatabaseService instance;
     private Statement statement;
     private Connection connection;
+    private static final Logger logger = LogManager.getLogger(ClientsDatabaseService.class.getName());
+
 
     public ClientsDatabaseService() {
 
@@ -40,6 +48,19 @@ public class ClientsDatabaseService {
         return oldName;
     }
 
+    public void changePassword(String nickname, String oldPassword, String newPassword) {
+        try (PreparedStatement ps = connection.prepareStatement(CHANGE_PASSWORD)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, nickname);
+            ps.setString(3, oldPassword);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.throwing(Level.ERROR, e);
+        }
+
+
+    }
 
     public void createNewUser(String login, String password, String username) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(ADD_NEW_USER)) {
@@ -59,14 +80,15 @@ public class ClientsDatabaseService {
             if (rs.next()) {
                 String result = rs.getString("username");
                 rs.close();
-                System.out.printf("login is: %s\n", result);
+                logger.info("login is: " + result);
                 return result;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException | UserNotFoundException e) {
+            logger.warn("User not found");
         }
-        throw new UserNotFoundException("User not found");
+        return null;
     }
+
 
 //    private void createDb() {
 //        try (Statement st = connection.createStatement()) {
@@ -80,7 +102,7 @@ public class ClientsDatabaseService {
     private void connect() throws ClassNotFoundException, SQLException {
         Class.forName(DRIVER);
         connection = DriverManager.getConnection(CONNECTION);
-        System.out.println("Connected to db!");
+        logger.info("Connected to db!");
         statement = connection.createStatement();
 
     }
@@ -88,9 +110,10 @@ public class ClientsDatabaseService {
     public void closeConnection() {
         try {
             if (connection != null) connection.close();
-            System.out.println("Disconnected from db!");
+            logger.warn("Disconnected from db!");
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
         }
     }
 

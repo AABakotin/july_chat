@@ -1,6 +1,10 @@
 package ru.geekbrains.july_chat.chat_server;
 
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.management.timer.Timer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +23,7 @@ public class ChatClientHandler {
     private Timer timer = new Timer();
     private static final int TIME_WAIT = 120;
     private final ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
+    private static final Logger logger = LogManager.getLogger(ChatClientHandler.class.getName());
 
 
     public ChatClientHandler(Socket socket, JulyChatServer server) {
@@ -26,11 +31,13 @@ public class ChatClientHandler {
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            System.out.println("Handler created");
+            logger.info("Handler created");
             this.server = server;
             scheduledExecutor.schedule(this::closeConnection, TIME_WAIT, TimeUnit.SECONDS);
         } catch (IOException e) {
-            System.err.println("Client has been disconnected");
+            logger.info("Client has been disconnected");
+
+
         }
     }
 
@@ -56,7 +63,7 @@ public class ChatClientHandler {
                     handleMessage(message);
                 }
             } catch (IOException e) {
-                System.err.println("Client has been disconnected");
+                logger.warn("Client has been disconnected");
             } finally {
                 closeConnection();
                 server.getExecuteService().shutdown();
@@ -121,7 +128,7 @@ public class ChatClientHandler {
                         this.server.addAuthorizedClientToList(this);
                         scheduledExecutor.shutdownNow();
                         sendMessage("authok:" + REGEX + this.currentUser);
-                        System.out.println("Client passed authorization");
+                        logger.info("Client passed authorization");
                         return true;
                     }
                     break;
@@ -141,8 +148,9 @@ public class ChatClientHandler {
     public void sendMessage(String message) {
         try {
             this.out.writeUTF(message);
+            logger.info(message);
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.throwing(Level.ERROR, e);
         }
     }
 }
