@@ -1,5 +1,9 @@
 package ru.geekbrains.july_chat.chat_app.net;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -14,6 +18,7 @@ public class NetworkService {
     private DataOutputStream out;
     private DataInputStream in;
     private ChatMessageService chatMessageService;
+    private static final Logger logger = LogManager.getLogger(NetworkService.class.getName());
 
     public NetworkService(ChatMessageService chatMessageService) throws IOException {
         this.chatMessageService = chatMessageService;
@@ -30,7 +35,7 @@ public class NetworkService {
                     chatMessageService.receive(message);
 
                 }catch (EOFException e) {
-                    System.err.println("Disconnected form server");
+                    logger.warn("\"Disconnected form server\"");
                     return;
                 }
                 catch (IOException e) {
@@ -46,10 +51,10 @@ public class NetworkService {
         try {
             out.writeUTF(message);
         } catch (SocketException e){
-            System.err.println("Can't send message with out connected server");
+            logger.warn("Can't send message with out connected server");
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e );
         }
     }
     public Socket getSocket() {

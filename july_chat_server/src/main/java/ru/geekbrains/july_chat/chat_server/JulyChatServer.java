@@ -1,5 +1,8 @@
 package ru.geekbrains.july_chat.chat_server;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.geekbrains.july_chat.chat_server.auth.AuthService;
 import ru.geekbrains.july_chat.chat_server.auth.DatabaseAuthService;
 
@@ -17,6 +20,7 @@ public class JulyChatServer {
     private AuthService authService;
     private Map<String, ChatClientHandler> handlers;
     private ExecutorService es;
+    private static final Logger logger = LogManager.getLogger(JulyChatServer.class.getName());
 
     public JulyChatServer() {
         this.authService = new DatabaseAuthService();
@@ -26,17 +30,17 @@ public class JulyChatServer {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server start!");
+            logger.info("Server start!");
             while (true) {
                 authService.start();
-                System.out.println("Waiting for connection......");
+                logger.info("Waiting for connection......");
                 Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
+                logger.info("Client connected");
                 new ChatClientHandler(socket, this).handle();
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
         }
     }
 

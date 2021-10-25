@@ -1,13 +1,17 @@
 package ru.geekbrains.july_chat.chat_app.net;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.EOFException;
 import java.io.IOException;
-
 
 
 public class ChatMessageService {
     private MessageProcessor messageProcessor;
     private NetworkService networkService;
+    private static final Logger logger = LogManager.getLogger(ChatMessageService.class.getName());
 
     public ChatMessageService(MessageProcessor messageProcessor) {
         this.messageProcessor = messageProcessor;
@@ -20,10 +24,10 @@ public class ChatMessageService {
             this.networkService = new NetworkService(this);
             networkService.readMessages();
         } catch (EOFException e) {
-            System.err.println("Disconnected form server");
+            logger.warn("\"Disconnected form server\"");
             return;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.throwing(Level.ERROR, e);
         }
 
     }
@@ -33,7 +37,11 @@ public class ChatMessageService {
     }
 
     public void send(String message) {
-        this.networkService.sendMessage(message);
+        try {
+            this.networkService.sendMessage(message);
+        }catch (RuntimeException e) {
+            logger.throwing(Level.WARN, e);
+        }
     }
 
     public void receive(String message) {

@@ -2,6 +2,7 @@ package ru.geekbrains.july_chat.chat_server.auth;
 
 import ru.geekbrains.july_chat.chat_server.db.ClientsDatabaseService;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
@@ -34,6 +35,7 @@ public class DatabaseAuthService implements AuthService {
 
     @Override
     public void changePassword(String username, String oldPassword, String newPassword) {
+    dbService.changePassword(username, oldPassword, newPassword);
 
     }
 

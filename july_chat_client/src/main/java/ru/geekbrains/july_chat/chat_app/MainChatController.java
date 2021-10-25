@@ -9,6 +9,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.geekbrains.july_chat.chat_app.net.ChatMessageService;
 import ru.geekbrains.july_chat.chat_app.net.MessageProcessor;
 
@@ -39,6 +41,7 @@ public class MainChatController implements Initializable, MessageProcessor {
 
     private ChatMessageService chatMessageService;
     private HistoryManager historyManager;
+    private static final Logger logger = LogManager.getLogger(MainChatController.class.getName());
 
     private void parseMessage(String message) {
         String[] parsedMessage = message.split(REGEX);
@@ -61,7 +64,7 @@ public class MainChatController implements Initializable, MessageProcessor {
                 try {
                     showError(parsedMessage[1]);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Registration complete");
+                    logger.info("Registration complete");
                 }
                 break;
             case "/list:":

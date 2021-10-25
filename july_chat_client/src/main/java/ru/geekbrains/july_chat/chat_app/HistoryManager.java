@@ -1,5 +1,9 @@
 package ru.geekbrains.july_chat.chat_app;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.geekbrains.july_chat.chat_app.net.NetworkService;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,6 +20,7 @@ public class HistoryManager {
     private static final String HISTORY_PATH = "history/";
     private File history;
     private String nick;
+    private static final Logger logger = LogManager.getLogger(HistoryManager.class.getName());
 
     public HistoryManager(String nickName) {
         this.nick= nickName;
@@ -52,7 +57,7 @@ public class HistoryManager {
             }
         }
         if (result != null) {
-            System.out.println("History for " + this.nick);
+            logger.info("History for " + this.nick);
         }
         return result;
     }

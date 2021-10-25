@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/july_chat.iml" filepath="$PROJECT_DIR$/july_chat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/july_chat_client/july_chat_client.iml" filepath="$PROJECT_DIR$/july_chat_client/july_chat_client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/july_chat_server/july_chat_server.iml" filepath="$PROJECT_DIR$/july_chat_server/july_chat_server.iml" />
+    </modules>
+  </component>
+</project>
